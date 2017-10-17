@@ -1,13 +1,47 @@
 <template>
   <div class="index">
     <a class="button is-primary" @click="fetchBeers()">Fetch</a>
-    <ul style="margin-top: 30px">
+    <a class="button is-primary" @click="form_seen = !form_seen">Create</a>
+
+    <form v-if="form_seen">
+      <div class="field">
+        <label class="label" for="name">Name</label>
+        <input class="input" type="text" id="name" name="name" placeholder="Name" v-model="form_data.v1_beer.name">
+      </div>
+
+      <div class="field">
+        <label class="label" for="brand">Brand</label>
+        <input class="input" type="text" id="brand" name="brand" placeholder="Brand" v-model="form_data.v1_beer.brand">
+      </div>
+
+      <div class="field">
+        <label class="label" for="price">Price</label>
+        <input class="input" type="text" name="price" placeholder="Price" v-model="form_data.v1_beer.price">
+      </div>
+
+      <div class="field">
+        <label class="label" for="store">Store</label>
+        <input class="input" type="text" name="store" placeholder="Store" v-model="form_data.v1_beer.store">
+      </div>
+
+      <div class="field">
+        <button class="button is-link" @click="createBeer()">Submit</button>
+      </div>
+
+    </form>
+
+    <ul style="margin-top: 50px">
       <li v-for="beer in beers.data">
-        <p><strong>{{ beer.attributes.name }}</strong></p>
-        <p>{{ beer.attributes.brand }}</p>
-        <p>R$ {{ beer.attributes.price }}</p>
+        <p><strong>Name: {{ beer.attributes.name }}</strong></p>
+        <p>Brand: {{ beer.attributes.brand }}</p>
+        <p>Cost: R$ {{ beer.attributes.price }}</p>
+        <p>Store: {{ beer.attributes.store }}</p>
       </li>
     </ul>
+
+    <div class="errors">
+      <p v-for="error in errors">{{ error }}</p>
+    </div>
   </div>
 </template>
 
@@ -19,7 +53,17 @@ export default {
   data () {
     return {
       beers: {},
-      errors: []
+      errors: [],
+
+      form_seen: false,
+      form_data: {
+        'v1_beer': {
+          name: '',
+          brand: '',
+          price: '',
+          store: ''
+        }
+      }
     }
   },
 
@@ -29,6 +73,14 @@ export default {
       .then(response => {
         this.beers = response.data
       })
+      .catch(e => {
+        this.errors.push(e)
+      })
+    },
+
+    createBeer () {
+      axios.post('http://localhost:3000/v1/beers', this.form_data)
+      .then(response => {})
       .catch(e => {
         this.errors.push(e)
       })
